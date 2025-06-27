@@ -1,0 +1,63 @@
+﻿﻿
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+
+<div class="footer">
+    <div class="footerBox">
+        <div id="przeczytales"><p>Did you read <br> everything? ⭢</p></div>
+        <div class="footerBox-content">
+            <h1>Do you like our offer? </h1>
+            <h1 id="kontakt">Contact us!</h1>
+        </div>
+    </div>
+    <div class="footerSmallBox"><h1>We love yachts just like you do</h1></div>
+    <div class="footerSmallBox">
+        <h3>Poznan</h3><br>
+        <p>
+           ProjektDyplomowy.poznan@gmail.com <br>
+            +48 999 999 999 <br>
+            ul. Karpia <br>
+            Poznań 61-619 <br>
+        </p>
+        <br>
+        <p id="mapa">Check the map</p>
+    </div>
+    <div class="footerSmallBox">
+        <h3>Warsaw</h3><br>
+        <p>
+            ProjektDyplomowy.warszawa@gmail.com <br>
+            +48 888 888 888 <br>
+            Aleje Jerozolimskie 100 <br>
+            Warszawa 01-001 <br>
+        </p>
+        <br>
+        <p id="mapa">Check the map</p>
+    </div>
+</div>
+<script>
+        document.querySelector('.review-form form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            // Odśwież listę opinii
+            const newReviews = await response.text();
+            document.querySelector('.reviews-list').innerHTML = newReviews;
+            this.reset();
+        }
+    });
+</script>

@@ -1,0 +1,29 @@
+﻿@model IEnumerable<ProjektDyplomowy.Models.Rental>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Yacht</th>
+            <th>Client</th>
+            <th>Rental Period</th>
+            <th>Management</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rental in Model)
+        {
+            <tr>
+                <td>@rental.Id</td>
+                <td>@rental.Yacht.Brand @rental.Yacht.Model</td>
+                <td>@rental.Client.UserName</td>
+                <td>@rental.RentalStart.ToString("yyyy-MM-dd")</td>
+                <td>@rental.RentalEnd.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a href="@Url.Action("EditRental", "Admin", new { id = rental.Id })" class="edit-rental-link btn btn-warning">Edit</a>
+                    <a href="@Url.Action("DeleteRental", "Admin", new { id = rental.Id })" class="delete-rental-link btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

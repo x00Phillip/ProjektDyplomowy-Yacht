@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ProjektDyplomowy.Models.Yacht>
+<div style="margin-bottom: 10px;">
+    <a href="#" id="add-yacht-link" class="add-yacht-link">Add Yacht</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Year</th>
+            <th>Management</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var yacht in Model)
+        {
+            <tr>
+                <td>@yacht.Id</td>
+                <td>@yacht.Brand</td>
+                <td>@yacht.Model</td>
+                <td>@yacht.Year</td>
+                <td>
+                    <a href="@Url.Action("EditYacht", "Admin", new { id = yacht.Id })" class="edit-car-link btn btn-warning">Edit</a>
+                    <a href="@Url.Action("DeleteYacht", "Admin", new { id = yacht.Id })" class="delete-car-link btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

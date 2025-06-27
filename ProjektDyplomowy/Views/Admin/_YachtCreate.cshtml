@@ -1,0 +1,93 @@
+﻿@model ProjektDyplomowy.Models.Yacht
+@{
+    ViewData["Title"] = "Add";
+}
+
+<hr />
+<div class="row">
+    <h4>Add Yacht</h4>
+    <div class="col-md-4">
+        <form asp-action="CreateYacht" asp-controller="Admin" method="post" id="yachtCreateForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Brand" class="control-label">Brand</label>
+                <input asp-for="Brand" class="form-control" />
+                <span asp-validation-for="Brand" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Model" class="control-label">Model</label>
+                <input asp-for="Model" class="form-control" />
+                <span asp-validation-for="Model" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Year" class="control-label">Year</label>
+                <input asp-for="Year" class="form-control" />
+                <span asp-validation-for="Year" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LengthInMeters" class="control-label">LengthInMeters</label>
+                <input asp-for="LengthInMeters" class="form-control" />
+                <span asp-validation-for="LengthInMeters" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxPersons" class="control-label">MaxPersons</label>
+                <input asp-for="MaxPersons" class="form-control" />
+                <span asp-validation-for="MaxPersons" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DailyRate" class="control-label">DailyRate</label>
+                <input asp-for="DailyRate" class="form-control" />
+                <span asp-validation-for="DailyRate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumberOfCabins" class="control-label">NumberOfCabins</label>
+                <input asp-for="NumberOfCabins" class="form-control" />
+                <span asp-validation-for="NumberOfCabins" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumberOfBathrooms" class="control-label">NumberOfBathrooms</label>
+                <input asp-for="NumberOfBathrooms" class="form-control" />
+                <span asp-validation-for="NumberOfBathrooms" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OwnerId" class="control-label">OwnerId</label>
+                <input asp-for="OwnerId" class="form-control" />
+                <span asp-validation-for="OwnerId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Yacht_LocationId" class="control-label">Yacht_LocationId</label>
+                <input asp-for="Yacht_LocationId" class="form-control" />
+                <span asp-validation-for="Yacht_LocationId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label">YachtType</label>
+                @Html.DropDownListFor(model => model.Type, new SelectList(Enum.GetValues(typeof(YachtType)), YachtType.Catamaran), new { @class = "form-control" })
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HasKitchen" class="form-check-label">HasKitchen</label>
+                <input asp-for="HasKitchen" class="form-check-input" />
+                <span asp-validation-for="HasKitchen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HasAirConditioning" class="form-check-label">HasAirConditioning</label>
+                <input asp-for="HasAirConditioning" class="form-check-input" />
+                <span asp-validation-for="HasAirConditioning" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HasWiFi" class="form-check-label">HasWiFi</label>
+                <input asp-for="HasWiFi" class="form-check-input" />
+                <span asp-validation-for="HasWiFi" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Image" class="control-label">Image</label>
+                <input asp-for="Image" class="form-control" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
+    </div>
+</div>

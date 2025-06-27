@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjektDyplomowy.Data;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 public class Program
 {
@@ -69,40 +70,49 @@ public class Program
         using (var scope = app.Services.CreateScope())
         {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-            string email = "admin@admin.com";
-            string password = "1qaz!QAZ";
-            string email2 = "filip@manager.com";
-            string password2 = "1qaz!QAZ";
-            string email3 = "patryk@manager.com";
-            string password3 = "1qaz!QAZ";
-            string email4 = "mateusz@manager.com";
-            string password4 = "1qaz!QAZ";
+            string admin_email = "admin@admin.com";
+            string admin_password = "1qaz!QAZ";
+            string manager1_email = "filip@manager.com";
+            string manager1_password = "1qaz!QAZ";
+            string manager2_email = "patryk@manager.com";
+            string manager2_password = "1qaz!QAZ";
+            string manager3_email = "mateusz@manager.com";
+            string manager3_password = "1qaz!QAZ";
 
-            if(await userManager.FindByEmailAsync(email) == null)
+            if (await userManager.FindByEmailAsync(admin_email) == null)
             {
-                var user = new IdentityUser();
-                user.UserName = email;
-                user.Email = email;
-                await userManager.CreateAsync (user, password);
-                var user2 = new IdentityUser();
-                user2.UserName = email2;
-                user2.Email = email2;
-                await userManager.CreateAsync(user2, password2);
-                var user3 = new IdentityUser();
-                user3.UserName = email3;
-                user3.Email = email3;
-                await userManager.CreateAsync(user3, password3);
-                var user4 = new IdentityUser();
-                user4.UserName = email4;
-                user4.Email = email4;
-                await userManager.CreateAsync(user4, password4);
+                var admin = new IdentityUser();
+                admin.Email = admin_email;
+                admin.UserName = admin_email;
 
-                userManager.AddToRoleAsync(user, "Admin");
-                userManager.AddToRoleAsync(user2, "Manager");
-                userManager.AddToRoleAsync(user3, "Manager");
-                userManager.AddToRoleAsync(user4, "Manager");
+                await userManager.CreateAsync(admin, admin_password);
+                await userManager.AddToRoleAsync(admin, "Admin");
             }
-           
+            if ((await userManager.FindByEmailAsync(manager1_email)) == null &&
+                (await userManager.FindByEmailAsync(manager2_email)) == null &&
+                (await userManager.FindByEmailAsync(manager3_email)) == null)
+            {
+                var manager1 = new IdentityUser();
+                manager1.Email = manager1_email;
+                manager1.UserName = manager1_email;
+
+
+                var manager2 = new IdentityUser();
+                manager2.Email = manager2_email;
+                manager2.UserName = manager2_email;
+
+                var manager3 = new IdentityUser();
+                manager3.Email = manager3_email;
+                manager3.UserName = manager3_email;
+
+
+                await userManager.CreateAsync(manager1, manager1_password);
+                await userManager.AddToRoleAsync(manager1, "Manager");
+                await userManager.CreateAsync(manager2, manager2_password);
+                await userManager.AddToRoleAsync(manager2, "Manager");
+                await userManager.CreateAsync(manager3, manager3_password);
+                await userManager.AddToRoleAsync(manager3, "Manager");
+            }
         }
         app.Run();
     }

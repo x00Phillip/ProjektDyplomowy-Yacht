@@ -1,8 +1,86 @@
-﻿@{
+﻿@model IEnumerable<ProjektDyplomowy.Models.Rating>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="slajd"></div>
+<div class="content">
+    <div class="Opinie" style="display: flex; gap: 20px;">
+        <!-- Sekcja wyświetlania opinii -->
+        <div class="opinie-lista" style="flex: 1; height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
+            <h3>Ratings</h3>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                @if (Model == null || !Model.Any())
+                {
+                    <p>No reviews to show.</p>
+                }
+                else
+                {
+                    foreach (var rating in Model)
+                    {
+                        if (rating?.User == null)
+                        {
+                            <p>Invalid Data.</p>
+                        }
+                        else
+                        {
+                            <li style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                    <!-- Gwiazdki oceny -->
+                                    <div style="color: gold;">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= rating.Mark)
+                                            {
+                                                <span>★</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color: #ddd;">★</span>
+                                            }
+                                        }
+                                    </div>
+                                    <strong>@rating.Title</strong>
+                                </div>
+                                <p>@rating.Description</p>
+                                <em>Rated: @rating.User.UserName</em>
+                            </li>
+                        }
+                    }
+                }
+            </ul>
+        </div>
+
+        <!-- Sekcja formularza dodawania opinii -->
+        <div id="formularz-opinii" class="formularz-opinii" style="flex: 1; border: 1px solid #ccc; padding: 10px;">
+            <h3>Add Your Opinion</h3>
+            <form method="post" asp-action="AddRating">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="Title">Tytuł</label>
+                    <input type="text" name="Title" class="form-control" required style="width: 100%;" />
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="Description">Opis</label>
+                    <textarea name="Description" class="form-control" required style="width: 100%; height: 100px;"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="Mark">Ocena</label>
+                    <select name="Mark" class="form-control" required style="width: 100%;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Dodaj ocenę</button>
+            </form>
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-warning">
+                    @TempData["Message"]
+                </div>
+            }
+        </div>
 </div>

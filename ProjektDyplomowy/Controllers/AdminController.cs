@@ -16,14 +16,16 @@ namespace ProjektDyplomowy.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<AdminController> _logger;
         public AdminController(
          UserManager<IdentityUser> userManager,
          RoleManager<IdentityRole> roleManager,
-         ApplicationDbContext context)
+         ApplicationDbContext context, ILogger<AdminController> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
+            _logger = logger;
         }
         // Ta metoda ustawia ViewData["IsAdmin"] dla wszystkich akcji w tym kontrolerze
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -42,38 +44,45 @@ namespace ProjektDyplomowy.Controllers
             var yachts = await _context.Yacht.ToListAsync();
             return PartialView("_YachtList", yachts);
         }
-        // Dodanie nowego jachtu (GET)
+        // GET
         public async Task<IActionResult> CreateYacht()
         {
             var partners = await _userManager.GetUsersInRoleAsync("Partner");
             ViewBag.Partners = new SelectList(partners, "Id", "Email");
-            ViewBag.Locations = _context.Yacht_Location.ToList(); // lub jak masz nazwane
+            ViewBag.Locations = new SelectList(_context.Yacht_Location, "Id", "Name");
+
             return PartialView("_YachtCreate", new Yacht());
         }
-        // Dodanie nowego jachtu (POST)
-        [HttpPost]
-        public async Task<IActionResult> CreateYacht(Yacht yacht)
+        /*public async Task<IActionResult> CreateYacht()
         {
-            // DEBUG – pokaż dane z modelu
-            Console.WriteLine($"OwnerId: {yacht.OwnerId}");
-            Console.WriteLine($"Yacht_LocationId: {yacht.Yacht_LocationId}");
+            var partners = await _userManager.GetUsersInRoleAsync("Partner");
+            ViewBag.Partners = new SelectList(partners, "Id", "Email");
+            ViewBag.Locations = new SelectList(_context.Yacht_Location.ToList(), "Id", "Name");
+            return PartialView("_YachtCreate", new Yacht());
+        }*/
 
-            if (ModelState.IsValid)
+        // POST
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateYacht([Bind("Id,Brand,Model,Year,LengthInMeters,MaxPersons,DailyRate,NumberOfCabins,NumberOfBathrooms,OwnerId,Yacht_LocationId,Type,HasKitchen,HasAirConditioning,HasWiFi,Image")] Yacht yacht)
+        {
+            _logger.LogInformation("POST Create called with data: {@Yacht}", yacht);
+            
+            if (!ModelState.IsValid)
             {
-                _context.Yacht.Add(yacht);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Yachts");
+                foreach (var key in ModelState.Keys)
+                {
+                    var errors = ModelState[key].Errors;
+                    foreach (var error in errors)
+                    {
+                        _logger.LogWarning("ModelState error for '{Key}': {Error}", key, error.ErrorMessage);
+                    }
+                }
             }
-
-            var errors = ModelState
-                .Where(ms => ms.Value.Errors.Count > 0)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                );
-
-            return BadRequest(errors);
-            //return PartialView("_YachtCreate", yacht);
+            var partners = await _userManager.GetUsersInRoleAsync("Partner");
+            ViewBag.Partners = new SelectList(partners, "Id", "Email", yacht.OwnerId);
+            ViewBag.Locations = new SelectList(_context.Yacht_Location, "Id", "Name", yacht.Yacht_LocationId);
+            return PartialView("_YachtCreate", yacht);
         }
         // Edycja jachtu (GET)
         public async Task<IActionResult> EditYacht(int id)

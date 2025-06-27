@@ -50,13 +50,16 @@
                 <span asp-validation-for="NumberOfBathrooms" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="OwnerId" class="control-label">OwnerId</label>
-                <input asp-for="OwnerId" class="form-control" />
+                <label asp-for="OwnerId" class="control-label">Owner</label>
+                @Html.DropDownListFor(model => model.OwnerId, (SelectList)ViewBag.Partners, "Select Partner", new { @class = "form-control", @required = "required" })
                 <span asp-validation-for="OwnerId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Yacht_LocationId" class="control-label">Yacht_LocationId</label>
-                <input asp-for="Yacht_LocationId" class="form-control" />
+                <label asp-for="Yacht_LocationId" class="control-label">Location</label>
+                @Html.DropDownListFor(model => model.Yacht_LocationId,
+                         new SelectList(ViewBag.Locations, "Id", "Name"),
+                         "Select Location",
+                         new { @class = "form-control", @required = "required" })
                 <span asp-validation-for="Yacht_LocationId" class="text-danger"></span>
             </div>
             <div class="form-group">

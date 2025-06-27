@@ -40,12 +40,14 @@ namespace ProjektDyplomowy.Models
         [Range(0, int.MaxValue, ErrorMessage = "Number of bathrooms must be greater than 0.")]
         public int NumberOfBathrooms { get; set; }
 
+        public IdentityUser Owner { get; set; }              // Bez [Required]
+        public Yacht_Location Yacht_Location { get; set; }    // Bez [Required]
 
+        [Required]
         public string OwnerId { get; set; }
-        public Owner Owner { get; set; }
 
+        [Required]
         public int Yacht_LocationId { get; set; }
-        public Yacht_Location Yacht_Location { get; set; }
 
         [Required]
         public YachtType Type { get; set; }

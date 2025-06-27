@@ -11,7 +11,6 @@ namespace ProjektDyplomowy.Data
         {
         }
         public DbSet<ProjektDyplomowy.Models.Yacht> Yacht { get; set; } = default!;
-        public DbSet<ProjektDyplomowy.Models.Owner> Owner { get; set; } = default!;
         public DbSet<ProjektDyplomowy.Models.Rental> Rental { get; set; } = default!;
         public DbSet<ProjektDyplomowy.Models.Rating> Rating { get; set; } = default!;
         public DbSet<ProjektDyplomowy.Models.Yacht_Location> Yacht_Location { get; set; } = default!;

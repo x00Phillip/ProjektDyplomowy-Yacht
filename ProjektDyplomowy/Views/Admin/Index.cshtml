@@ -4,8 +4,11 @@
     {
         <!-- Przycisk do zarządzania samochodami -->
         <button class="btn btn-primary" id="manageYachtsBtn">Yacht Management</button>
+        <!-- Przycisk do zarządzania lokalizacjami -->
+        <button class="btn btn-primary" id="manageLocationBtn">Location Management</button>
         <!-- Przycisk do zarządzania użytkownikami -->
         <button class="btn btn-primary" id="manageUsersBtn">User Management</button>
+        
     }
     <!-- Przycisk do zarządzania rezerwacjami -->
     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
@@ -28,6 +31,10 @@
             // Obsługa przycisku "Manage Yachts"
             $('#manageYachtsBtn').click(function () {
                 $('#dataContainer').load('@Url.Action("Yachts", "Admin")');
+            });
+            // Obsługa przycisku "Manage Locations"
+            $('#manageLocationBtn').click(function () {
+                $('#dataContainer').load('@Url.Action("YachtLocations", "Admin")');
             });
 
             // Obsługa przycisku "Manage Users"
@@ -52,26 +59,69 @@
                 });
             });
 
-            // Obsługa wysyłania formularza dodawania samochodu
+            // Obsługa wysyłania formularza dodawania jachtu
             $(document).on('submit', '#yachtCreateForm', function (e) {
                 e.preventDefault(); // Zapobiega przeładowaniu strony
                 const form = $(this);
 
                 // Wysłanie formularza jako POST
                 $.post(form.attr('action'), form.serialize(), function (response) {
-                    // Po dodaniu samochodu, załaduj zaktualizowaną tabelę samochodów
+                    // Po dodaniu jachtu, załaduj zaktualizowaną tabelę jachtów
                     $.get('@Url.Action("Yachts", "Admin")', function (data) {
-                        $('#dataContainer').html(data); // Załaduj listę samochodów po dodaniu
+                        $('#dataContainer').html(data); // Załaduj listę jachtów po dodaniu
                     }).fail(function () {
                         alert("Failed to load updated car list.");
+                    });
+                }).fail(function (response) {
+            let errorMessages = '';
+            if (response.responseJSON) {
+                const errors = response.responseJSON;
+                for (const field in errors) {
+                    if (errors.hasOwnProperty(field)) {
+                        errorMessages += errors[field].join('<br/>') + '<br/>';
+                    }
+                }
+            } else {
+                errorMessages = "Unknown error occurred.";
+            }
+            alert("There were errors:\n" + errorMessages);
+        });
+            });
+            // Obsługa kliknięcia w link "Add Location"
+            $(document).on('click', '#add-location-link', function (e) {
+                e.preventDefault(); // Zapobiega przeładowaniu strony
+
+                // Wywołanie żądania GET do kontrolera Admin/CreateYacht
+                $.get('@Url.Action("CreateYachtLocation", "Admin")', function (data) {
+                    $('#dataContainer').html(data); // Załaduj formularz do kontenera
+                }).fail(function () {
+                    alert("Failed to load the form. Please try again.");
+                });
+            });
+            // Obsługa wysyłania formularza dodawania lokalizacji
+            $(document).on('submit', '#locationCreateForm', function (e) {
+                e.preventDefault(); // Zapobiega przeładowaniu strony
+                const form = $(this);
+
+                // Wysłanie formularza jako POST
+                $.post(form.attr('action'), form.serialize(), function (response) {
+                    // Po dodaniu lokalizacji, załaduj zaktualizowaną tabelę lokalizacji
+                    $.get('@Url.Action("YachtLocations", "Admin")', function (data) {
+                        $('#dataContainer').html(data); // Załaduj listę lokalizacji po dodaniu
+                    }).fail(function () {
+                        alert("Failed to load updated location list.");
                     });
                 }).fail(function (response) {
                     // Jeśli formularz nie przeszedł walidacji, wyświetl błędy
                     const errors = response.responseJSON;
                     let errorMessages = '';
-                    for (const field in errors) {
-                        if (errors.hasOwnProperty(field)) {
-                            errorMessages += errors[field].join('<br/>');
+                    if (Array.isArray(errors)) {
+                    errorMessages = errors.join('<br/>');
+                    } else {
+                        for (const field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessages += errors[field] + '<br/>';
+                            }
                         }
                     }
                     alert("There were errors:\n" + errorMessages);
@@ -151,7 +201,7 @@
             });
         });
 
-        // Edycja samochodu
+        // Edycja jachtu
         $(document).on("click", ".edit-yacht-link", function (e) {
             e.preventDefault();
             const url = $(this).attr("href");
@@ -174,8 +224,46 @@
             });
         });
 
-        // Usuwanie samochodu
+        // Usuwanie jachtu
         $(document).on("click", ".delete-yacht-link", function (e) {
+            e.preventDefault();
+            if (!confirm("Are you sure you want to delete this car?")) {
+                return;
+            }
+
+            const url = $(this).attr("href");
+
+            $.post(url, function (response) {
+                $("#dataContainer").html(response); // Załaduj zaktualizowaną listę
+            }).fail(function () {
+                alert("Failed to delete the car. Please try again.");
+            });
+        });
+        // Edycja lokalizacji
+        $(document).on("click", ".edit-location-link", function (e) {
+            e.preventDefault();
+            const url = $(this).attr("href");
+
+            $.get(url, function (data) {
+                $("#dataContainer").html(data); // Załaduj formularz edycji
+            }).fail(function () {
+                alert("Failed to load the edit form. Please try again.");
+            });
+        });
+
+        $(document).on("submit", "#locationEditForm", function (e) {
+            e.preventDefault();
+            const form = $(this);
+
+            $.post(form.attr("action"), form.serialize(), function (response) {
+                $("#dataContainer").html(response); // Załaduj zaktualizowaną listę
+            }).fail(function () {
+                alert("Failed to save changes. Please try again.");
+            });
+        });
+
+        // Usuwanie jachtu
+        $(document).on("click", ".delete-location-link", function (e) {
             e.preventDefault();
             if (!confirm("Are you sure you want to delete this car?")) {
                 return;

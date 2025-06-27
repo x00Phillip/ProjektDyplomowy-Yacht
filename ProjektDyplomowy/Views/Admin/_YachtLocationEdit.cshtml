@@ -1,0 +1,36 @@
+﻿@model ProjektDyplomowy.Models.Yacht_Location
+@{
+    ViewData["Title"] = "Add Location";
+}
+
+<hr />
+<div class="row">
+    <h4>Edit Yacht Location</h4>
+
+    <form asp-action="EditYachtLocation" asp-controller="Admin" method="post" id="locationEditForm">
+        <input type="hidden" asp-for="Id" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address" class="control-label"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MapUrl" class="control-label"></label>
+            <input asp-for="MapUrl" class="form-control" />
+            <span asp-validation-for="MapUrl" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+
+</div>

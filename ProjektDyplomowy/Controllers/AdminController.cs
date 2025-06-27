@@ -36,31 +36,46 @@ namespace ProjektDyplomowy.Controllers
         {
             return View();
         }
-        // Wyświetlenie listy samochodów
+        // Wyświetlenie listy jachtów
         public async Task<IActionResult> Yachts()
         {
             var yachts = await _context.Yacht.ToListAsync();
             return PartialView("_YachtList", yachts);
         }
-        // Dodanie nowego samochodu (GET)
-        public IActionResult CreateYacht()
+        // Dodanie nowego jachtu (GET)
+        public async Task<IActionResult> CreateYacht()
         {
-            return PartialView("_YachtCreate");
+            var partners = await _userManager.GetUsersInRoleAsync("Partner");
+            ViewBag.Partners = new SelectList(partners, "Id", "Email");
+            ViewBag.Locations = _context.Yacht_Location.ToList(); // lub jak masz nazwane
+            return PartialView("_YachtCreate", new Yacht());
         }
-        // Dodanie nowego samochodu (POST)
+        // Dodanie nowego jachtu (POST)
         [HttpPost]
         public async Task<IActionResult> CreateYacht(Yacht yacht)
         {
+            // DEBUG – pokaż dane z modelu
+            Console.WriteLine($"OwnerId: {yacht.OwnerId}");
+            Console.WriteLine($"Yacht_LocationId: {yacht.Yacht_LocationId}");
+
             if (ModelState.IsValid)
             {
                 _context.Yacht.Add(yacht);
                 await _context.SaveChangesAsync();
-                // Po dodaniu samochodu przeładuj listę samochodów w panelu admina
                 return RedirectToAction("Yachts");
             }
-            return PartialView("_YachtCreate", yacht);
+
+            var errors = ModelState
+                .Where(ms => ms.Value.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+
+            return BadRequest(errors);
+            //return PartialView("_YachtCreate", yacht);
         }
-        // Edycja samochodu (GET)
+        // Edycja jachtu (GET)
         public async Task<IActionResult> EditYacht(int id)
         {
             var yacht = await _context.Yacht.FindAsync(id);
@@ -70,7 +85,7 @@ namespace ProjektDyplomowy.Controllers
             }
             return PartialView("_YachtEdit", yacht);
         }
-        // Edycja samochodu (POST)
+        // Edycja jachtu (POST)
         [HttpPost]
         public async Task<IActionResult> EditYacht(Yacht yacht)
         {
@@ -84,7 +99,7 @@ namespace ProjektDyplomowy.Controllers
             return PartialView("_YachtEdit", yacht);
         }
 
-        // Usunięcie samochodu
+        // Usunięcie jachtu
         public async Task<IActionResult> DeleteYacht(int id)
         {
             var yacht = await _context.Yacht.FindAsync(id);
@@ -356,5 +371,72 @@ namespace ProjektDyplomowy.Controllers
             var rentals = await _context.Rental.ToListAsync();
             return PartialView("_RentalList", rentals);
         }
+        // Wyświetlenie listy lokalizacji
+        public async Task<IActionResult> YachtLocations()
+        {
+            var locations = await _context.Yacht_Location.ToListAsync();
+            return PartialView("_YachtLocationList", locations);
+        }
+        // Dodanie nowej lokalizacji (GET)
+        public IActionResult CreateYachtLocation()
+        {
+            return PartialView("_YachtLocationCreate", new Yacht_Location());
+        }
+
+        // Dodanie nowej lokalizacji (POST)
+        [HttpPost]
+        public async Task<IActionResult> CreateYachtLocation(Yacht_Location yacht_Location)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Yacht_Location.Add(yacht_Location);
+                await _context.SaveChangesAsync();
+                var locations = await _context.Yacht_Location.ToListAsync();
+                return PartialView("_YachtLocationList", locations);
+            }
+            return PartialView("_YachtLocationCreate", yacht_Location);
+        }
+
+        // Edycja lokalizacji (GET)
+        public async Task<IActionResult> EditYachtLocation(int id)
+        {
+            var location = await _context.Yacht_Location.FindAsync(id);
+            if (location == null)
+            {
+                return NotFound();
+            }
+            return PartialView("_YachtLocationEdit", location);
+        }
+
+        // Edycja lokalizacji (POST)
+        [HttpPost]
+        public async Task<IActionResult> EditYachtLocation(Yacht_Location yacht_Location)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Yacht_Location.Update(yacht_Location);
+                await _context.SaveChangesAsync();
+                var locations = await _context.Yacht_Location.ToListAsync();
+                return PartialView("_YachtLocationList", locations);
+            }
+            return PartialView("_YachtLocationEdit", yacht_Location);
+        }
+
+        // Usunięcie lokalizacji
+        public async Task<IActionResult> DeleteYachtLocation(int id)
+        {
+            var location = await _context.Yacht_Location.FindAsync(id);
+            if (location == null)
+            {
+                return NotFound();
+            }
+            _context.Yacht_Location.Remove(location);
+            await _context.SaveChangesAsync();
+
+            var locations = await _context.Yacht_Location.ToListAsync();
+            return PartialView("_YachtLocationList", locations);
+        }
+
+
     }
 }

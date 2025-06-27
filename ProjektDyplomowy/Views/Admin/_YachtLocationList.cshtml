@@ -1,0 +1,28 @@
+﻿@model IEnumerable<ProjektDyplomowy.Models.Yacht_Location>
+<div style="margin-bottom: 10px;">
+    <a href="#" id="add-location-link" class="add-location-link">Add Yacht Location</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var location in Model)
+        {
+            <tr>
+                <td>@location.Id</td>
+                <td>@location.Name</td>
+                <td>@location.Address</td>
+                <td>
+                    <a href="@Url.Action("EditYachtLocation", "Admin", new { id = location.Id })" class="edit-location-link btn btn-warning">Edit</a>
+                    <a href="@Url.Action("DeleteYachtLocation", "Admin", new { id = location.Id })" class="delete-location-link btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

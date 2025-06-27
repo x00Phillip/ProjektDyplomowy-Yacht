@@ -12,7 +12,6 @@ namespace ProjektDyplomowy.Models
 
         public string? Address { get; set; }
         public string? MapUrl { get; set; }
-
-        public ICollection<Yacht> Yachts { get; set; }
+        public ICollection<Yacht> Yachts { get; set; } = new List<Yacht>();
     }
 }

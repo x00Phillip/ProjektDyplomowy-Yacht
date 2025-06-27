@@ -7,7 +7,7 @@
 <div class="row">
     <h4>Edit Yacht</h4>
     <div class="col-md-4">
-        <form asp-action="CreateYacht" asp-controller="Admin" method="post" id="yachtEditForm">
+        <form asp-action="EditYacht" asp-controller="Admin" method="post" id="yachtEditForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Brand" class="control-label">Brand</label>
@@ -86,7 +86,7 @@
                 <span asp-validation-for="Image" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Edit</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
     </div>

@@ -20,8 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Migrations\" />
     <Folder Include="Services\" />
+    <Folder Include="Views\Payments\" />
+    <Folder Include="Views\SkipperLicenses\" />
+    <Folder Include="Views\SupportMessages\" />
   </ItemGroup>
 
 </Project>

@@ -99,22 +99,34 @@ namespace ProjektDyplomowy.Controllers
         }
         // Edycja jachtu (POST)
         [HttpPost]
-        public async Task<IActionResult> EditYacht(Yacht yacht)
+        public async Task<IActionResult> EditYacht(int id, [Bind("Id,Brand,Model,Year,LengthInMeters,MaxPersons,DailyRate,NumberOfCabins,NumberOfBathrooms,OwnerId,Yacht_LocationId,Type,HasKitchen,HasAirConditioning,HasWiFi,Image")] Yacht yacht)
         {
-            if (ModelState.IsValid)
+            Yacht y = new()
             {
-                _context.Yacht.Update(yacht);
-                await _context.SaveChangesAsync();
-                var yachts = await _context.Yacht
-                .Include(y => y.Owner)
-                .Include(y => y.Yacht_Location)
-                .ToListAsync();
-                return PartialView("_YachtList", yachts);
-            }
+                Id = yacht.Id,
+                Brand = yacht.Brand,
+                Model = yacht.Model,
+                Year = yacht.Year,
+                LengthInMeters = yacht.LengthInMeters,
+                MaxPersons = yacht.MaxPersons,
+                DailyRate = yacht.DailyRate,
+                NumberOfBathrooms = yacht.NumberOfBathrooms,
+                NumberOfCabins = yacht.NumberOfCabins,
+                Type = yacht.Type,
+                HasAirConditioning = yacht.HasAirConditioning,
+                HasKitchen = yacht.HasKitchen,
+                HasWiFi = yacht.HasWiFi,
+                OwnerId = yacht.OwnerId,
+                Yacht_LocationId = yacht.Yacht_LocationId
+            };
+            _context.Yacht.Update(y);
+            await _context.SaveChangesAsync();
             var partners = await _userManager.GetUsersInRoleAsync("Partner");
             ViewBag.Partners = new SelectList(partners, "Id", "Email", yacht.OwnerId);
             ViewBag.Locations = new SelectList(_context.Yacht_Location, "Id", "Name", yacht.Yacht_LocationId);
-            return PartialView("_YachtEdit", yacht);
+            var yachts = await _context.Yacht.ToListAsync();
+            return PartialView("_YachtList", yachts);
+            //return PartialView("_YachtEdit", yacht);
         }
 
         // Usunięcie jachtu

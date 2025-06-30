@@ -8,8 +8,8 @@
         public decimal PricePerDay { get; set; }
         public decimal SkipperFeePerDay { get; set; } = 250.00m; // example default value
         public bool WithSkipper { get; set; }
-        public decimal TotalPrice =>
-            RentalDays * PricePerDay + (WithSkipper ? RentalDays * SkipperFeePerDay : 0);
+        public decimal TotalPrice { get; set; } //=>
+                                                //RentalDays * PricePerDay + (WithSkipper ? RentalDays * SkipperFeePerDay : 0);
         public int YachtId { get; set; }
         public string YachtBrand { get; set; }
         public string YachtModel { get; set; }

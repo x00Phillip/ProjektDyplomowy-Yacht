@@ -1,0 +1,155 @@
+﻿@model IEnumerable<ProjektDyplomowy.Models.Yacht>
+@{
+    ViewData["Title"] = "YachtsMain";
+    var brands = ViewBag.Brands as List<string>;
+}
+<div class="header">
+    <h1>Title</h1>
+    <p>Find your perfect yacht. Choose from the best brand in the world</p>
+</div>
+
+<div class="filter-panel">
+    <div class="filter-options">
+        <button id="toggle-filter" class="filter-button">Filter</button>
+        <div id="filter-dropdown" class="filter-dropdown" style="display: none; position: absolute;">
+            <button id="clear-filters" class="clear-button">Clean All</button>
+            <div id="price-filter">
+                <div class="filter-section">
+                    <button class="section-toggle">Price</button>
+                    <div class="section-content" style="display: none;">
+                        <label for="price-min">Min:</label>
+                        <input type="number" id="price-min" class="price-input" placeholder="0" min="0">
+                        <label for="price-max">Max:</label>
+                        <input type="number" id="price-max" class="price-input" placeholder="2000" min="0">
+                    </div>
+                </div>
+            </div>
+            <div id="brand-filters">
+                <div class="filter-section">
+                    <button class="section-toggle" type="button">Brand</button>
+                    <div class="section-content" style="display: none;">
+                        @if (brands != null && brands.Any())
+                        {
+                            foreach (var brand in brands)
+                            {
+                                <div class="brand-filter-item">
+                                    <label>
+                                        <input type="checkbox" value="@brand" class="brand-checkbox"> @brand
+                                    </label>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="car-count">
+        <p id="yacht-count">Yachts (@Model.Count())</p>
+    </div>
+    <div class="sort-options">
+        <label for="sort">Sort by price:</label>
+        <select id="sort">
+            <option value="price-asc">Price (ascending)</option>
+            <option value="price-desc">Price (descending)</option>
+        </select>
+    </div>
+</div>
+
+<div class="cars-container">
+    @foreach (var yacht in Model)
+    {
+        <div class="car-tile" data-price="@yacht.DailyRate" data-brand="@yacht.Brand">
+            <a href="@Url.Action("Details", new { id = yacht.Id })"><img src="@yacht.Image" alt="Jacht" class="car-image"></a>
+            <h3>@yacht.Brand @yacht.Model</h3>
+            <p class="price">From<span class="price-value">@yacht.DailyRate PLN</span></p>
+            <div class="car-details">
+          @*       <div class="detail"><img src="~/images/icons/acceleration.svg" alt="">@yacht.Acceleration s do 100km/h</div>
+                <div class="detail"><img src="~/images/icons/gearshift.png" alt="">@yacht.Transmission</div>
+                <div class="detail"><img src="~/images/icons/power.svg" alt="">@yacht.HorsePower KM / @yacht.Torque NM</div>
+                <div class="detail"><img src="~/images/icons/capacity.svg">@yacht.BodyType</div> *@
+            </div>
+            <a href="@Url.Action("Details", new { id = yacht.Id })" class="details-button">See Details</a>
+        </div>
+    }
+</div>
+
+<script>
+         document.getElementById('sort').addEventListener('change', function () {
+        const sortOption = this.value; // Pobiera wybraną opcję sortowania
+        const container = document.querySelector('.cars-container');
+        const cars = Array.from(container.querySelectorAll('.car-tile')); // Pobiera wszystkie samochody
+
+        // Sortowanie na podstawie ceny (data-price)
+        cars.sort((a, b) => {
+            const priceA = parseFloat(a.dataset.price);
+            const priceB = parseFloat(b.dataset.price);
+
+            if (sortOption === 'price-asc') {
+                return priceA - priceB; // Sortowanie rosnące
+            } else if (sortOption === 'price-desc') {
+                return priceB - priceA; // Sortowanie malejące
+            }
+        });
+
+        // Przebudowanie listy w widoku
+        cars.forEach(car => container.appendChild(car));
+    });
+</script>
+<script>
+    // Toggle filter dropdown visibility
+    document.getElementById('toggle-filter').addEventListener('click', function () {
+        const dropdown = document.getElementById('filter-dropdown');
+        const isHidden = dropdown.style.display === 'none';
+        dropdown.style.display = isHidden ? 'block' : 'none';
+    });
+    document.querySelectorAll('.section-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function () {
+            const content = this.nextElementSibling;
+            const isHidden = content.style.display === 'none';
+        content.style.display = isHidden ? 'block' : 'none';
+        });
+    });
+
+    // Filter cars by brand
+    document.getElementById('brand-filters').addEventListener('change', function () {
+        applyFilters();
+    });
+
+    // Filter cars by price
+    document.getElementById('price-filter').addEventListener('input', function () {
+        applyFilters();
+    });
+
+    // Clear all filters
+    document.getElementById('clear-filters').addEventListener('click', function () {
+        document.querySelectorAll('.brand-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.price-input').forEach(input => input.value = '');
+        applyFilters();
+    });
+
+       function applyFilters() {
+        const selectedBrands = Array.from(document.querySelectorAll('.brand-checkbox:checked')).map(cb => cb.value.toLowerCase());
+        const priceMin = parseFloat(document.getElementById('price-min').value) || 0;
+        const priceMax = parseFloat(document.getElementById('price-max').value) || Infinity;
+        const cars = document.querySelectorAll('.car-tile');
+
+        let visibleCount = 0;
+
+        cars.forEach(car => {
+            const carBrand = car.getAttribute('data-brand').toLowerCase();
+            const carPrice = parseFloat(car.getAttribute('data-price'));
+
+            const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(carBrand);
+            const matchesPrice = carPrice >= priceMin && carPrice <= priceMax;
+
+            const isVisible = matchesBrand && matchesPrice;
+            car.style.display = isVisible ? 'block' : 'none';
+
+            if (isVisible) visibleCount++;
+        });
+
+        // Aktualizuj licznik jachtów
+        document.getElementById('yacht-count').textContent = `Yachts (${visibleCount})`;
+    }
+</script>

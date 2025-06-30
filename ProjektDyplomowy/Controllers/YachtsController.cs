@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,32 +19,65 @@ namespace ProjektDyplomowy.Controllers
         {
             _context = context;
         }
-      
-        // GET: Yachts/Create
-        public IActionResult Create()
+        [HttpGet]
+        public IActionResult GetUnavailableDates(int yachtId)
         {
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["Yacht_LocationId"] = new SelectList(_context.Yacht_Location, "Id", "Name");
-            return View();
-        }
+            var yacht = _context.Yacht.Include(c => c.Rentals).FirstOrDefault(c => c.Id == yachtId);
 
-        // POST: Yachts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Brand,Model,Year,LengthInMeters,MaxPersons,DailyRate,NumberOfCabins,NumberOfBathrooms,OwnerId,Yacht_LocationId,Type,HasKitchen,HasAirConditioning,HasWiFi,Image")] Yacht yacht)
-        {
-            if (ModelState.IsValid)
+            if (yacht == null)
             {
-                _context.Add(yacht);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "Id", yacht.OwnerId);
-            ViewData["Yacht_LocationId"] = new SelectList(_context.Yacht_Location, "Id", "Name", yacht.Yacht_LocationId);
+
+            // Lista zablokowanych dat
+            var unavailableDates = yacht.Rentals.Select(r => new
+            {
+                from = r.RentalStart.ToString("yyyy-MM-dd"), // Data rozpoczęcia
+                to = r.RentalEnd.ToString("yyyy-MM-dd")     // Data zakończenia
+            }).ToList();
+
+            return Json(unavailableDates);
+        }
+        // GET: Car/Details
+        [Authorize]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            ViewBag.YachtId = id;
+            var yacht = await _context.Yacht.FirstOrDefaultAsync(c => c.Id == id);
+
             return View(yacht);
         }
-   
+
+        public async Task<IActionResult> YachtsMain(decimal? minPrice, decimal? maxPrice, List<string> brands)
+        {
+            var yachtsQuery = _context.Yacht.AsQueryable();
+
+            // Filtrowanie po marce
+            if (brands != null && brands.Any())
+            {
+               yachtsQuery = yachtsQuery.Where(c => brands.Contains(c.Brand));
+            }
+
+            // Filtrowanie po cenie
+            if (minPrice.HasValue)
+            {
+                yachtsQuery = yachtsQuery.Where(c => c.DailyRate >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                yachtsQuery = yachtsQuery.Where(c => c.DailyRate <= maxPrice.Value);
+            }
+
+            var cars = await yachtsQuery.ToListAsync();
+            // Pobierz wszystkie unikalne marki do ViewBag
+            var allBrands = await _context.Yacht.Select(c => c.Brand).Distinct().ToListAsync();
+            ViewBag.Brands = allBrands;
+            return View(cars);
+        }
+
     }
 }

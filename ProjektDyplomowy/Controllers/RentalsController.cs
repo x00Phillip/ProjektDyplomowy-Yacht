@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,158 +14,72 @@ namespace ProjektDyplomowy.Controllers
     public class RentalsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public RentalsController(ApplicationDbContext context)
+        public RentalsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
-
-        // GET: Rentals
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> OrderConfirmation(string selectedDates, int yachtId)
         {
-            var applicationDbContext = _context.Rental.Include(r => r.Client).Include(r => r.Yacht);
-            return View(await applicationDbContext.ToListAsync());
-        }
+            // selectedDates zawiera wybrane daty w formacie "YYYY-MM-DD to YYYY-MM-DD"
+            var dates = selectedDates.Split(" to "); // Rozdzielenie zakresu dat
+            DateTime startDate = DateTime.Parse(dates[0]);
+            DateTime endDate = DateTime.Parse(dates[1]);
 
-        // GET: Rentals/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            var yacht = await _context.Yacht.FindAsync(yachtId);
+            if (yacht == null)
             {
-                return NotFound();
+                return NotFound("Yacht not found.");
             }
 
-            var rental = await _context.Rental
-                .Include(r => r.Client)
-                .Include(r => r.Yacht)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (rental == null)
+            int rentalDays = (endDate - startDate).Days;
+            decimal totalPrice = rentalDays * yacht.DailyRate;
+
+            var viewModel = new ConfirmOrderViewModel
             {
-                return NotFound();
-            }
+                StartDate = startDate,
+                EndDate = endDate,
+                YachtId = yacht.Id,
+                YachtBrand = yacht.Brand,
+                YachtModel = yacht.Model,
+                PricePerDay = yacht.DailyRate,
+                TotalPrice = totalPrice
+            };
 
-            return View(rental);
+            return View(viewModel);
         }
 
-        // GET: Rentals/Create
-        public IActionResult Create()
-        {
-            ViewData["ClientId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["YachtId"] = new SelectList(_context.Yacht, "Id", "Brand");
-            return View();
-        }
-
-        // POST: Rentals/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ClientId,YachtId,RentalStart,RentalEnd,Price,WithSkipper,SailingLicenseNumber,RadioOperatorLicense,LicenseValidUntil")] Rental rental)
+        public async Task<IActionResult> FinalizeOrder(ConfirmOrderViewModel model)
         {
-            if (ModelState.IsValid)
+            var user = await _userManager.FindByNameAsync(User.Identity?.Name);
+            if (user == null)
             {
-                _context.Add(rental);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClientId"] = new SelectList(_context.Users, "Id", "Id", rental.ClientId);
-            ViewData["YachtId"] = new SelectList(_context.Yacht, "Id", "Brand", rental.YachtId);
-            return View(rental);
-        }
-
-        // GET: Rentals/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                return Unauthorized("User not found.");
             }
 
-            var rental = await _context.Rental.FindAsync(id);
-            if (rental == null)
+            var rental = new Rental
             {
-                return NotFound();
-            }
-            ViewData["ClientId"] = new SelectList(_context.Users, "Id", "Id", rental.ClientId);
-            ViewData["YachtId"] = new SelectList(_context.Yacht, "Id", "Brand", rental.YachtId);
-            return View(rental);
-        }
+                YachtId = model.YachtId,
+                Yacht = await _context.Yacht.FindAsync(model.YachtId),
+                RentalStart = model.StartDate,
+                RentalEnd = model.EndDate,
+                ClientId = user.Id,
+                Client = user,
+            };
 
-        // POST: Rentals/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ClientId,YachtId,RentalStart,RentalEnd,Price,WithSkipper,SailingLicenseNumber,RadioOperatorLicense,LicenseValidUntil")] Rental rental)
-        {
-            if (id != rental.Id)
-            {
-                return NotFound();
-            }
+            rental.Price = rental.CalculatePrice();
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(rental);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RentalExists(rental.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClientId"] = new SelectList(_context.Users, "Id", "Id", rental.ClientId);
-            ViewData["YachtId"] = new SelectList(_context.Yacht, "Id", "Brand", rental.YachtId);
-            return View(rental);
-        }
-
-        // GET: Rentals/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var rental = await _context.Rental
-                .Include(r => r.Client)
-                .Include(r => r.Yacht)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (rental == null)
-            {
-                return NotFound();
-            }
-
-            return View(rental);
-        }
-
-        // POST: Rentals/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var rental = await _context.Rental.FindAsync(id);
-            if (rental != null)
-            {
-                _context.Rental.Remove(rental);
-            }
-
+            _context.Rental.Add(rental);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
-        private bool RentalExists(int id)
+            return RedirectToAction("Confirmation", new { rentalId = rental.Id });
+        }
+        public IActionResult Confirmation()
         {
-            return _context.Rental.Any(e => e.Id == id);
+            return View();
         }
     }
 }

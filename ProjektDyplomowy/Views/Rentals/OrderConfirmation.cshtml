@@ -1,0 +1,31 @@
+﻿@model ConfirmOrderViewModel
+
+<div class="rental-confirmation">
+    <h2>Potwierdzenie rezerwacji</h2>
+
+    <div class="rental-car-spec">
+        <h3>Dane samochodu</h3>
+        <p><strong>Marka:</strong> @Model.YachtBrand</p>
+        <p><strong>Model:</strong> @Model.YachtModel</p>
+        <p><strong>Cena za dzień:</strong> @Model.PricePerDay.ToString("C")</p>
+    </div>
+
+    <div class="rental-dates">
+        <h3>Wybrane daty</h3>
+        <p><strong>Data rozpoczęcia:</strong> @Model.StartDate.ToString("yyyy-MM-dd")</p>
+        <p><strong>Data zakończenia:</strong> @Model.EndDate.ToString("yyyy-MM-dd")</p>
+    </div>
+
+    <div class="total-price">
+        <h3>Łączna cena</h3>
+        <p><strong>Do zapłaty:</strong> @Model.TotalPrice.ToString("C")</p>
+    </div>
+
+    <form method="post" asp-action="FinalizeOrder">
+        <input type="hidden" asp-for="StartDate" />
+        <input type="hidden" asp-for="EndDate" />
+        <input type="hidden" asp-for="YachtId" />
+        <input type="hidden" asp-for="TotalPrice" />
+        <button type="submit" class="btn btn-primary">Potwierdź rezerwację</button>
+    </form>
+</div>

@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Rental>
+
+@{
+    ViewData["Title"] = "Historia wypożyczeń";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Samochód</th>
+            <th>Data wypożyczenia</th>
+            <th>Data zwrotu</th>
+            <th>Cena</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rental in Model)
+        {
+            <tr>
+                <td>@rental.Yacht.Brand</td>
+                <td>@rental.RentalStart.ToString("yyyy-MM-dd")</td>
+                <td>@rental.RentalEnd.ToString("yyyy-MM-dd")</td>
+                <td>@rental.Price</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a class="btn btn-secondary" href="/Identity/Account/Manage">Powrót do zarządzania kontem</a>

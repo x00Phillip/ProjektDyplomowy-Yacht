@@ -26,7 +26,7 @@
 
 @section Scripts {
     <script>
-        // Załaduj listy (samochody, użytkownicy, rezerwacje)
+        // Załaduj listy (jachty, użytkownicy, rezerwacje, lokalizacje)
         $(document).ready(function () {
             // Obsługa przycisku "Manage Yachts"
             $('#manageYachtsBtn').click(function () {
@@ -47,7 +47,7 @@
                 $('#dataContainer').load('@Url.Action("Rentals", "Admin")');
             });
 
-            // Obsługa kliknięcia w link "Add Car"
+            // Obsługa kliknięcia w link "Add Yacht"
             $(document).on('click', '#add-yacht-link', function (e) {
                 e.preventDefault(); // Zapobiega przeładowaniu strony
 
@@ -213,21 +213,23 @@
             });
         });
 
-        $(document).on("submit", "#yachtEditForm", function (e) {
+               $(document).on("submit", "#yachtEditForm", function (e) {
             e.preventDefault();
             const form = $(this);
 
             $.post(form.attr("action"), form.serialize(), function (response) {
-                $("#dataContainer").html(response); // Załaduj zaktualizowaną listę
-            }).fail(function () {
-                alert("Failed to save changes. Please try again.");
+                $("#dataContainer").html(response); // Zwraca listę lub formularz z błędami
+            }).fail(function (xhr, status, error) {
+                alert("Błąd podczas zapisu: " + error);
+                console.error("Status:", status);
+                console.error("Response:", xhr.responseText);
             });
         });
 
         // Usuwanie jachtu
         $(document).on("click", ".delete-yacht-link", function (e) {
             e.preventDefault();
-            if (!confirm("Are you sure you want to delete this car?")) {
+            if (!confirm("Are you sure you want to delete this yacht?")) {
                 return;
             }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjektDyplomowy.Data;
 using ProjektDyplomowy.Models;
+using Microsoft.CodeAnalysis;
 
 namespace ProjektDyplomowy.Controllers
 {
@@ -53,32 +54,31 @@ namespace ProjektDyplomowy.Controllers
 
             return PartialView("_YachtCreate", new Yacht());
         }
-        /*public async Task<IActionResult> CreateYacht()
-        {
-            var partners = await _userManager.GetUsersInRoleAsync("Partner");
-            ViewBag.Partners = new SelectList(partners, "Id", "Email");
-            ViewBag.Locations = new SelectList(_context.Yacht_Location.ToList(), "Id", "Name");
-            return PartialView("_YachtCreate", new Yacht());
-        }*/
-
         // POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateYacht([Bind("Id,Brand,Model,Year,LengthInMeters,MaxPersons,DailyRate,NumberOfCabins,NumberOfBathrooms,OwnerId,Yacht_LocationId,Type,HasKitchen,HasAirConditioning,HasWiFi,Image")] Yacht yacht)
         {
-            _logger.LogInformation("POST Create called with data: {@Yacht}", yacht);
-            
-            if (!ModelState.IsValid)
+            Yacht y = new()
             {
-                foreach (var key in ModelState.Keys)
-                {
-                    var errors = ModelState[key].Errors;
-                    foreach (var error in errors)
-                    {
-                        _logger.LogWarning("ModelState error for '{Key}': {Error}", key, error.ErrorMessage);
-                    }
-                }
-            }
+                Brand = yacht.Brand,
+                Model = yacht.Model,
+                Year = yacht.Year,
+                LengthInMeters = yacht.LengthInMeters,
+                MaxPersons = yacht.MaxPersons,
+                DailyRate = yacht.DailyRate,
+                NumberOfBathrooms = yacht.NumberOfBathrooms,
+                NumberOfCabins = yacht.NumberOfCabins,
+                Type = yacht.Type,
+                HasAirConditioning = yacht.HasAirConditioning,
+                HasKitchen = yacht.HasKitchen,
+                HasWiFi = yacht.HasWiFi,
+                OwnerId = yacht.OwnerId,
+                Yacht_LocationId = yacht.Yacht_LocationId
+            };
+            _context.Add(y);
+            await _context.SaveChangesAsync();
+
             var partners = await _userManager.GetUsersInRoleAsync("Partner");
             ViewBag.Partners = new SelectList(partners, "Id", "Email", yacht.OwnerId);
             ViewBag.Locations = new SelectList(_context.Yacht_Location, "Id", "Name", yacht.Yacht_LocationId);
@@ -92,6 +92,9 @@ namespace ProjektDyplomowy.Controllers
             {
                 return NotFound();
             }
+            var partners = await _userManager.GetUsersInRoleAsync("Partner");
+            ViewBag.Partners = new SelectList(partners, "Id", "Email", yacht.OwnerId);
+            ViewBag.Locations = new SelectList(_context.Yacht_Location, "Id", "Name", yacht.Yacht_LocationId);
             return PartialView("_YachtEdit", yacht);
         }
         // Edycja jachtu (POST)
@@ -102,9 +105,15 @@ namespace ProjektDyplomowy.Controllers
             {
                 _context.Yacht.Update(yacht);
                 await _context.SaveChangesAsync();
-                var yachts = await _context.Yacht.ToListAsync();
+                var yachts = await _context.Yacht
+                .Include(y => y.Owner)
+                .Include(y => y.Yacht_Location)
+                .ToListAsync();
                 return PartialView("_YachtList", yachts);
             }
+            var partners = await _userManager.GetUsersInRoleAsync("Partner");
+            ViewBag.Partners = new SelectList(partners, "Id", "Email", yacht.OwnerId);
+            ViewBag.Locations = new SelectList(_context.Yacht_Location, "Id", "Name", yacht.Yacht_LocationId);
             return PartialView("_YachtEdit", yacht);
         }
 

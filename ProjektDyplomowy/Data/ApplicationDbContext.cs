@@ -17,5 +17,21 @@ namespace ProjektDyplomowy.Data
         public DbSet<ProjektDyplomowy.Models.Payment> Payment { get; set; } = default!;
         public DbSet<ProjektDyplomowy.Models.SupportMessage> SupportMessage { get; set; } = default!;
         public DbSet<ProjektDyplomowy.Models.SkipperLicense> SkipperLicense { get; set; } = default!;
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Yacht>()
+                .HasOne(y => y.Owner)
+                .WithMany()
+                .HasForeignKey(y => y.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<YachtFavorite>()
+                .HasOne(f => f.User)
+                .WithMany()
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

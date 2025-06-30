@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
 <hr />
 <div class="row">
     <h4>Edit Yacht</h4>
@@ -50,13 +49,13 @@
                 <span asp-validation-for="NumberOfBathrooms" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="OwnerId" class="control-label">OwnerId</label>
-                <input asp-for="OwnerId" class="form-control" />
+                <label asp-for="OwnerId" class="control-label">Owner</label>
+                <select asp-for="OwnerId" asp-items="ViewBag.Partners" class="form-control" required></select>
                 <span asp-validation-for="OwnerId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Yacht_LocationId" class="control-label">Yacht_LocationId</label>
-                <input asp-for="Yacht_LocationId" class="form-control" />
+                <label asp-for="Yacht_LocationId" class="control-label">Location</label>
+                <select asp-for="Yacht_LocationId" asp-items="ViewBag.Locations" class="form-control" required></select>
                 <span asp-validation-for="Yacht_LocationId" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -10,13 +10,13 @@ namespace ProjektDyplomowy.Models
         public int Id { get; set; }
 
         [Required]
-        public string Brand { get; set; }
+        public string Brand { get; set; } = default!;
 
         [Required]
-        public string Model { get; set; }
+        public string Model { get; set; } = default!;
 
         [Required]
-        [Range(200, int.MaxValue, ErrorMessage = "Year must be greater than 2000")]
+        [Range(2000, int.MaxValue, ErrorMessage = "Year must be greater than 2000")]
         public int Year { get; set; }
 
         [Required]
@@ -41,15 +41,12 @@ namespace ProjektDyplomowy.Models
         public int NumberOfBathrooms { get; set; }
 
         [Required]
-        public string OwnerId { get; set; }
-        public IdentityUser Owner { get; set; }
+        public string OwnerId { get; set; } = default!;
+        public IdentityUser Owner { get; set; } = default!;
 
         [Required]
         public int Yacht_LocationId { get; set; }
-        public Yacht_Location Yacht_Location { get; set; }    
-
-        
-
+        public Yacht_Location Yacht_Location { get; set; } = default!;
 
         [Required]
         public YachtType Type { get; set; }
@@ -64,13 +61,8 @@ namespace ProjektDyplomowy.Models
 
         public string Image { get; set; } = "https://staging.simple.tn/wp-content/uploads/2024/07/default.png";
 
-        public ICollection<Rental> Rentals { get; set; }
+        public ICollection<Rental> Rentals { get; set; } = [];
 
-        public Yacht()
-        {
-            Rentals = new List<Rental>();
-        }
-       
     }
     public enum YachtType
     {

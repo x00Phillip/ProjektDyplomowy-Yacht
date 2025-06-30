@@ -8,7 +8,7 @@ using ProjektDyplomowy.Data;
 
 #nullable disable
 
-namespace ProjektDyplomowy.Data.Migrations
+namespace ProjektDyplomowy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -478,6 +478,33 @@ namespace ProjektDyplomowy.Data.Migrations
                     b.ToTable("Yacht");
                 });
 
+            modelBuilder.Entity("ProjektDyplomowy.Models.YachtFavorite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("YachtId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("YachtId");
+
+                    b.ToTable("YachtFavorite");
+                });
+
             modelBuilder.Entity("ProjektDyplomowy.Models.Yacht_Location", b =>
                 {
                     b.Property<int>("Id")
@@ -629,7 +656,7 @@ namespace ProjektDyplomowy.Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ProjektDyplomowy.Models.Yacht_Location", "Yacht_Location")
@@ -641,6 +668,25 @@ namespace ProjektDyplomowy.Data.Migrations
                     b.Navigation("Owner");
 
                     b.Navigation("Yacht_Location");
+                });
+
+            modelBuilder.Entity("ProjektDyplomowy.Models.YachtFavorite", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProjektDyplomowy.Models.Yacht", "Yacht")
+                        .WithMany()
+                        .HasForeignKey("YachtId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Yacht");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Rating", b =>

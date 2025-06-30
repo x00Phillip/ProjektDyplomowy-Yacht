@@ -9,11 +9,11 @@ using ProjektDyplomowy.Data;
 
 #nullable disable
 
-namespace ProjektDyplomowy.Data.Migrations
+namespace ProjektDyplomowy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250622033841_BasicModelandController")]
-    partial class BasicModelandController
+    [Migration("20250630204221_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,21 +225,6 @@ namespace ProjektDyplomowy.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("ProjektDyplomowy.Models.Owner", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UserId1")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("Owner");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Payment", b =>
@@ -496,6 +481,33 @@ namespace ProjektDyplomowy.Data.Migrations
                     b.ToTable("Yacht");
                 });
 
+            modelBuilder.Entity("ProjektDyplomowy.Models.YachtFavorite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("YachtId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("YachtId");
+
+                    b.ToTable("YachtFavorite");
+                });
+
             modelBuilder.Entity("ProjektDyplomowy.Models.Yacht_Location", b =>
                 {
                     b.Property<int>("Id")
@@ -568,15 +580,6 @@ namespace ProjektDyplomowy.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ProjektDyplomowy.Models.Owner", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Payment", b =>
@@ -653,10 +656,10 @@ namespace ProjektDyplomowy.Data.Migrations
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Yacht", b =>
                 {
-                    b.HasOne("ProjektDyplomowy.Models.Owner", "Owner")
-                        .WithMany("Yachts")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Owner")
+                        .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ProjektDyplomowy.Models.Yacht_Location", "Yacht_Location")
@@ -670,9 +673,23 @@ namespace ProjektDyplomowy.Data.Migrations
                     b.Navigation("Yacht_Location");
                 });
 
-            modelBuilder.Entity("ProjektDyplomowy.Models.Owner", b =>
+            modelBuilder.Entity("ProjektDyplomowy.Models.YachtFavorite", b =>
                 {
-                    b.Navigation("Yachts");
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ProjektDyplomowy.Models.Yacht", "Yacht")
+                        .WithMany()
+                        .HasForeignKey("YachtId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Yacht");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Rating", b =>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjektDyplomowy.Data;
 
@@ -11,9 +12,11 @@ using ProjektDyplomowy.Data;
 namespace ProjektDyplomowy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250702193411_Seeding")]
+    partial class Seeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -271,7 +274,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("RentalId");
 
-                    b.ToTable("Payment", (string)null);
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Rating", b =>
@@ -300,7 +303,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Rating", (string)null);
+                    b.ToTable("Rating");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.RatingImage", b =>
@@ -322,7 +325,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("RatingId");
 
-                    b.ToTable("RatingImage", (string)null);
+                    b.ToTable("RatingImage");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Rental", b =>
@@ -368,7 +371,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("YachtId");
 
-                    b.ToTable("Rental", (string)null);
+                    b.ToTable("Rental");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.SkipperLicense", b =>
@@ -397,7 +400,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SkipperLicense", (string)null);
+                    b.ToTable("SkipperLicense");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.SupportMessage", b =>
@@ -426,7 +429,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SupportMessage", (string)null);
+                    b.ToTable("SupportMessage");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Yacht", b =>
@@ -493,7 +496,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("Yacht_LocationId");
 
-                    b.ToTable("Yacht", (string)null);
+                    b.ToTable("Yacht");
 
                     b.HasData(
                         new
@@ -712,7 +715,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasIndex("YachtId");
 
-                    b.ToTable("YachtFavorite", (string)null);
+                    b.ToTable("YachtFavorite");
                 });
 
             modelBuilder.Entity("ProjektDyplomowy.Models.Yacht_Location", b =>
@@ -735,7 +738,7 @@ namespace ProjektDyplomowy.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Yacht_Location", (string)null);
+                    b.ToTable("Yacht_Location");
 
                     b.HasData(
                         new

@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
     <Folder Include="Views\Payments\" />
     <Folder Include="Views\SkipperLicenses\" />
     <Folder Include="Views\SupportMessages\" />

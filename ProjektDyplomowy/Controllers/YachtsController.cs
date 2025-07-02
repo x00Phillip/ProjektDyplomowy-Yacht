@@ -38,7 +38,7 @@ namespace ProjektDyplomowy.Controllers
 
             return Json(unavailableDates);
         }
-        // GET: Car/Details
+        // GET: Yacht/Details
         [Authorize]
         public async Task<IActionResult> Details(int? id)
         {

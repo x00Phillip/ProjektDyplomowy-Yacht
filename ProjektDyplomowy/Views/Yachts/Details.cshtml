@@ -38,7 +38,10 @@
             </div>
         </div>
     </div>
-    <input id="rentalDatePicker" type="text" placeholder="Select Date" />
+    <div class="datepicker-wrapper" style="position: relative; display: inline-block;">
+        <input id="rentalDatePicker" type="text" placeholder="Select Date" style="padding-right: 2.5rem;" />
+        <i class="fa-solid fa-calendar-days" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: #555;"></i>
+    </div>
     <form method="POST" action="/Rental/OrderConfirmation">
         <input type="hidden" name="yachtId" value="@ViewBag.YachtId" />
         <input type="hidden" id="selectedDates" name="selectedDates" value="" />
@@ -46,12 +49,11 @@
     </form>
 </div>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Pobranie niedostępnych dat z kontrolera
-        const carId = window.location.pathname.split('/').pop();
-        fetch(`/Car/GetUnavailableDates?carId=${carId}`)
+        const yachtId = window.location.pathname.split('/').pop();
+        fetch(`/Yachts/GetUnavailableDates?yachtId=${yachtId}`)
             .then(response => response.json())
             .then(data => {
                 flatpickr('#rentalDatePicker', {
